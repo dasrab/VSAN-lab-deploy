@@ -31,4 +31,3 @@
           mac_changes: True
         validate_certs: False
       when: vcenter.ip  ==  vc_mng.ip
-
