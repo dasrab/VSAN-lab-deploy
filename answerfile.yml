@@ -1,51 +1,49 @@
-# path to the ESXi Installer ISO
-esxIso: '/root/ISOs/VMware-VMvisor-Installer-6.0.0.U2-3620759.x86_64.iso'
+#path to the ESXi Installer ISO
+esxIso: '/root/ISOs/VMware-ESXi-6.5.0-OS-Release-4564106-HPE-650.9.6.0.28-Nov2016.iso'
 #esxIso: '/root/ISOs/VMware-VMvisor-Installer-6.5.0-4887370.x86_64.iso'
 # path to vCenter installer ISO
-vcIso: '/root/ISOs/VMware-VCSA-all-6.0.0.U2-3634788.iso'
+vcIso: '/root/ISOs/VMware-VCSA-all-6.5.0-4944578.iso'
 #vcIso: '/root/ISOs/VMware-VCSA-all-6.5.0-5178943.iso'
 
 
 
 # configuration for accessing the existing physical ESXi
 physicalESX:
-  host: '10.29.14.36' 
-  user: 'root' 
-  password: 'VMware1!' 
-  vlan: 318
+  host: '172.18.200.160'
+  user: 'root'
+  password: 'VMware1!'
+  vlan: 0
   vswitch: vSwitch0
 
 # the vCenter appliance that need to be deployed
 vcenter:
-  ip: '10.29.14.45' # vCenter ip address 
-  mask: '27'
-  gw: '10.29.14.33'
+  ip: '172.18.201.31' # vCenter ip address
+  mask: '255.255.192.0'
+  gw: '172.18.292.20'
   network: 'Infrastructure' # this portGroup will be created on the pESX with the vlan id specified in the physicalESX section
-  name: '10.29.14.45' # FQDN if there is working DNS server, otherwise put the ip as a name
-  psc_name: '10.29.14.45' # if psc_name is the same as name above and psc_ip is the same as ip above, it will be vCenter with embeded PSC.
-  psc_ip: '10.29.14.45' # just change the name and ip address for the PSC if you want external PSC to be deployed.
+  name: '172.18.200.160' # FQDN if there is working DNS server, otherwise put the ip as a name
+  psc_name: '172.18.200.160' # if psc_name is the same as name above and psc_ip is the same as ip above, it will be vCenter with embeded PSC.
+  psc_ip: '172.18.200.160' # just change the name and ip address for the PSC if you want external PSC to be deployed.
   thin: 'true'
-  user: 'administrator@yasen.local' 
-  password: 'VMware1!' 
-  datacenter: 'MyDC1' 
+  user: 'administrator@vsphere.local'
+  password: 'VMware1!'
+  datacenter: 'MyDC1'
   datastore: 'datastore1' # Datastore name where the nested ESXi VMs will be deployed
-  domain: 'yasen.local'
+  domain: 'vsphere.local'
 # if there is existing VC connected to the physical ESXi change the configuration here. If there is no existing VC the config must be the same as the vcenter section above
 vc_mng:
-  ip: '10.29.14.45' # if you have existing VC already deployed and connected to the physical ESX put the ip address here, otherwise it must be the same as the parameters in vcenter section above
-  mask: '27'
-  gw: '10.29.14.33'
+  ip: '172.18.201.31' # if you have existing VC already deployed and connected to the physical ESX put the ip address here, otherwise it must be the same as the parameters in vcenter section above
+  mask: '255.255.192.0'
+  gw: '172.18.192.20'
   network: 'Infrastructure'
-  name: '10.29.14.45' # if you have existing VC already deployed and connected to the physical ESX put the existing VC VM name here, otherwise it must be the same as the parameters in vcenter section above
-  user: 'administrator@yasen.local' 
-  password: 'VMware1!' 
-  datacenter: 'MyDC1' 
+  name: '172.18.201.31' # if you have existing VC already deployed and connected to the physical ESX put the existing VC VM name here, otherwise it must be the same as the parameters in vcenter section above
+  user: 'administrator@vsphere.local'
+  password: 'VMware1!'
+  datacenter: 'MyDC1'
   datastore: 'datastore1'
-  domain: 'yasen.local'
-
-dns1: '10.29.12.201'
-dns2: '8.8.8.8'
-domain: 'yasen.local'
+  domain: 'vsphere.local'
+dns1: '172.18.192.5'
+domain: 'vsphere.local'
 
 clusters: # You can add, remove or rename clusters in this section, you can specify to which cluster specific nested ESXi to be connected to
 # Do not change ha and vsan to True untill I fix a bug. It is better to go and enable first vSAN and HA after the deployment is done
@@ -53,96 +51,42 @@ clusters: # You can add, remove or rename clusters in this section, you can spec
     ha: False
     drs: False
     vsan: False
-  Edge:
-    ha: True
-    drs: True
-    vsan: True
   Compute:
     ha: True
     drs: True
     vsan: True
 
-# vMotion vlan and network, no need to be reachible, you can configure random values here
-vmotion_vlan: 1078
-vmotion_mask: 255.255.255.0
-vmotion_gw: 172.16.122.250
-
-# vSAN  vlan and network, no need to be reachible, you can configure random values here
-vsan_vlan: 1079
-vsan_mask: 255.255.255.0
-vsan_gw: 172.16.123.250
-
 # You can add, remove or rename the nested ESXi below, in this example the names will be esx1, esx2, etc ...
 vESX:
   esx1:
-    ip: 10.29.14.38
-    mask: 255.255.255.224
-    gw: 10.29.14.33
+    ip: 172.18.195.201
+    mask: 255.255.192.0
+    gw: 172.18.192.20
     mng_cluster: 'Management' # the cluster where physical ESXi is connected to. The nested VMs will be deployed here
     cluster: Compute # the cluster where this specific nested ESXi need to be connected to
-    vlan: 318 # the external vlan id, need to have connectivity with the vCener
-    cpu: 4 # CPU count
-    ram: 32768 # memory
-    hdd: 180 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
-    vmotion_ip: 172.16.122.1 
-    vsan_ip: 172.16.123.1 # even if you dont need vSAN put an IP address here otherwise the install will fail
-  esx2:
-    ip: 10.29.14.39
-    mask: 255.255.255.224
-    gw: 10.29.14.33
+    vlan: 0 # the external vlan id, need to have connectivity with the vCener
+    cpu: 10 # CPU count
+    ram: 12288 # memory
+    hdd: 12288 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
+ esx2:
+    ip: 172.18.195.202
+    mask: 255.255.192.0
+    gw: 172.18.192.0
     mng_cluster: 'Management' # the cluster where physical ESXi is connected to. The nested VMs will be deployed here
     cluster: Compute # the cluster where this specific nested ESXi need to be connected to
-    vlan: 318 # the external vlan id, need to have connectivity with the vCener
-    cpu: 4 # CPU count
-    ram: 32768 # memory
-    hdd: 180 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
-    vmotion_ip: 172.16.122.2 
-    vsan_ip: 172.16.123.2 # even if you dont need vSAN put an IP address here otherwise the install will fail
+    vlan: 0 # the external vlan id, need to have connectivity with the vCener
+    cpu: 10 # CPU count
+    ram: 12288 # memory
+    hdd: 12288 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
   esx3:
-    ip: 10.29.14.40
-    mask: 255.255.255.224
-    gw: 10.29.14.33
+    ip: 172.18.195.203
+    mask: 255.255.192.0
+    gw: 172.18.192.0
     mng_cluster: 'Management' # the cluster where physical ESXi is connected to. The nested VMs will be deployed here
     cluster: Compute # the cluster where this specific nested ESXi need to be connected to
-    vlan: 318 # the external vlan id, need to have connectivity with the vCener
+    vlan: 0 # the external vlan id, need to have connectivity with the vCener
     cpu: 4 # CPU count
-    ram: 32768 # memory
-    hdd: 180 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
-    vmotion_ip: 172.16.122.3 
-    vsan_ip: 172.16.123.3 # even if you dont need vSAN put an IP address here otherwise the install will fail
-  esx4:
-    ip: 10.29.14.41
-    mask: 255.255.255.224
-    gw: 10.29.14.33
-    mng_cluster: 'Management' # the cluster where physical ESXi is connected to. The nested VMs will be deployed here
-    cluster: Edge # the cluster where this specific nested ESXi need to be connected to
-    vlan: 318 # the external vlan id, need to have connectivity with the vCener
-    cpu: 4 # CPU count
-    ram: 32768 # memory
-    hdd: 180 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
-    vmotion_ip: 172.16.122.4 
-    vsan_ip: 172.16.123.4 # even if you dont need vSAN put an IP address here otherwise the install will fail
-  esx5:
-    ip: 10.29.14.42
-    mask: 255.255.255.224
-    gw: 10.29.14.33
-    mng_cluster: 'Management' # the cluster where physical ESXi is connected to. The nested VMs will be deployed here
-    cluster: Edge # the cluster where this specific nested ESXi need to be connected to
-    vlan: 318 # the external vlan id, need to have connectivity with the vCener
-    cpu: 4 # CPU count
-    ram: 32768 # memory
-    hdd: 180 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
-    vmotion_ip: 172.16.122.5 
-    vsan_ip: 172.16.123.5 # even if you dont need vSAN put an IP address here otherwise the install will fail
-  esx6:
-    ip: 10.29.14.43
-    mask: 255.255.255.224
-    gw: 10.29.14.33
-    mng_cluster: 'Management' # the cluster where physical ESXi is connected to. The nested VMs will be deployed here
-    cluster: Edge # the cluster where this specific nested ESXi need to be connected to
-    vlan: 318 # the external vlan id, need to have connectivity with the vCener
-    cpu: 4 # CPU count
-    ram: 32768 # memory
-    hdd: 180 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
-    vmotion_ip: 172.16.122.6 
-    vsan_ip: 172.16.123.6 # even if you dont need vSAN put an IP address here otherwise the install will fail
+    ram: 12288 # memory
+    hdd: 12288 # there is one HDD 8GB by default where the ESXi OS is installed. Additional one is SSD emulated drive configured half of the value here, and third HDD is according the value here
+
+
