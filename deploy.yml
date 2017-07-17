@@ -15,6 +15,6 @@
       pause: minutes=5
       when: vESX|length > 5
 - include: playbooks/configureNestedESXi.yml
-- include: playbooks/createVDS.yml
+
 
 
